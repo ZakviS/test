@@ -17,31 +17,88 @@
   </nav>
   <div class="container" id="main-container">
   <div class="row">
-    <div *ngFor="let employee of employees" class="col-md-6 col-xl-3">
-       <div class="card m-b-30">
-          <div class="card-body row">
-             <div class="col-6">
-                <a href=""><img src="" alt="" class="img-fluid rounded-circle w-60"></a>
-             </div>
-             <div class="col-6 card-title align-self-center mb-0">
-                <h5>{{employee?.name}}</h5>
-                <p class="m-0">{{employee?.positionId}}</p>
-             </div>
-          </div>
-          <ul class="list-group list-group-flush">
-             <li class="list-group-item"><i class="fa fa-envelope float-right"></i>{{employee?.email}}</li>
-             <li class="list-group-item"><i class="fa fa-phone float-right"></i>Phone : {{employee?.phoneNumber}}</li>
-          </ul>
-          <div class="card-body">
-             <div class="float-right btn-group btn-group-sm">
-                 <a (click)="onOpenModal(employee, 'edit')" class="btn btn-primary tooltips" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil"></i> </a> 
-                <a (click)="onOpenModal(employee, 'delete')" class="btn btn-secondary tooltips" data-placement="top" data-original-title="Delete"><i class="fa fa-times"></i></a>
-             </div>
-          </div>
-       </div>
-    </div>
   </div>
   
+  <div class="container">
+   <div class="row">
+       <div class="col-lg-12 card-margin">
+           <div class="card search-form">
+               <div class="card-body p-0">
+                   <form id="search-form">
+                       <div class="row">
+                           <div class="col-12">
+                               <div class="row no-gutters">
+                                   <div class="col-lg-3 col-md-3 col-sm-12 p-0">
+                                       <select class="form-control" id="exampleFormControlSelect1">
+                                           <option>Paris</option>
+                                       </select>
+                                   </div>
+                                    <div class="col-lg-8 col-md-6 col-sm-12 p-0">
+                                       <input type="text" placeholder="Search..." class="form-control" [(ngModel)]="searchEmployee.surname" id="search" name="search">
+                                       <!-- Здесь можно добавить еще поля для других параметров поиска, если необходимо -->
+                                     </div>
+                                     <div class="col-lg-1 col-md-3 col-sm-12 p-0">
+                                       <button type="button" class="btn btn-base" (click)="search()"> <!-- Изменение типа кнопки на 'button' -->
+                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                       </button>
+                                     </div>
+
+                               </div>
+                           </div>
+                       </div>
+                   </form>
+               </div>
+           </div>
+       </div>
+   </div>
+
+  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+  <hr>
+  <div class="container bootstrap snippets bootdey">
+      <div class="row">
+          <div class="col-lg-12">
+              <div class="main-box no-header clearfix">
+                  <div class="main-box-body clearfix">
+                      <div class="table-responsive">
+                          <table class="table user-list">
+                              <thead>
+                                  <tr>
+                                  <th><span>Employee</span></th>
+                                  <th><span>Beggining</span></th>
+                                  <th><span>Dismissal</span></th>
+                                  <th><span>Email</span></th>
+                                  <th>&nbsp;</th>
+                                  </tr>
+                              </thead>
+                              <tbody *ngFor="let employee of employees">
+                                  <tr>
+                                      <td>
+                                          <img src="https://bootdey.com/img/Content/user_1.jpg" alt="">
+                                          <a href="#" class="user-link">{{employee.name}} {{employee.surname}}</a>
+                                          <span class="user-subhead">{{nameOfPosition(employee)}}</span>
+                                      </td>
+                                      <td>{{employee.beginning}}</td>
+                                      <td>{{employee.dismissal}}</td>
+                                      <td>
+                                          <a href="#">{{employee.email}}</a>
+                                      </td>
+                                      <div class="card-body">
+                                       <div class="float-right btn-group btn-group-sm">
+                                           <a (click)="onOpenModal(employee, 'edit')" class="btn btn-primary tooltips" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil"></i> </a> 
+                                          <a (click)="onOpenModal(employee, 'delete')" class="btn btn-secondary tooltips" data-placement="top" data-original-title="Delete"><i class="fa fa-times"></i></a>
+                                       </div>
+                                    </div>
+                                 </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
   <!-- Add Employee Modal -->
   <!-- <div class="modal fade" id="addEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
