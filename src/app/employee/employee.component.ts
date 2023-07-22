@@ -49,33 +49,66 @@ export class EmployeeComponent implements OnInit {
     );
   }
   
-  // public onAddEmloyee(addForm: NgForm): void {
-  //   document.getElementById('add-employee-form').click();
+  public onAddEmloyee(addForm: NgForm): void {
+    document.getElementById('add-employee-form')!.click();
+    this.employeeService.addEmployee(addForm.value).subscribe(
+      (response: Employee) => {
+        console.log(response);
+        this.getEmployees();
+        addForm.reset();
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+        addForm.reset();
+      }
+    );
+  }
+
+  //   public onAddEmloyee(addForm: NgForm): void {
+  //   console.log(addForm)
+  //   // const employee1: Employee = {
+  //   //   id: addForm.value.id,
+  //   //   name: addForm.value.name,
+  //   // surname: addForm.value.surname,
+  //   // secondSurname: addForm.value.secondSurname,
+  //   // beginning: addForm.value.beginning,
+  //   // dismissal: addForm.value.dismissal,
+  //   // phoneNumber: addForm.value.phoneNumber,
+  //   // email: addForm.value.email,
+  //   // positionId: addForm.value.positionId
+  //   // };
+  //   console.log(addForm.value)
   //   this.employeeService.addEmployee(addForm.value).subscribe(
-  //     (response: Employee) => {
-  //       console.log(response);
-  //       this.getEmployees();
-  //       addForm.reset();
-  //     },
-  //     (error: HttpErrorResponse) => {
-  //       alert(error.message);
-  //       addForm.reset();
-  //     }
-  //   );
+  //         (response: Employee) => {
+  //           console.log(response);
+  //           this.getEmployees();
+  //           addForm.reset();
+  //         },
+  //         (error: HttpErrorResponse) => {
+  //           alert(error.message);
+  //           addForm.reset();
+  //         }
+  //       );
+  // }
+
+  
+  public onUpdateEmloyee(employee: Employee): void {
+    this.employeeService.updateEmployee(employee).subscribe(
+      (response: Employee) => {
+        console.log(response);
+        this.getEmployees();
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  // public onUpdateEmloyee(employee: Employee): void {
+  //   console.log(employee)
+  //   console.log(employee.id)
   // }
   
-  // public onUpdateEmloyee(employee: Employee): void {
-  //   this.employeeService.updateEmployee(employee).subscribe(
-  //     (response: Employee) => {
-  //       console.log(response);
-  //       this.getEmployees();
-  //     },
-  //     (error: HttpErrorResponse) => {
-  //       alert(error.message);
-  //     }
-  //   );
-  // }
-  //
   public onDeleteEmloyee(employeeId: number): void {
     this.employeeService.deleteEmployee(employeeId).subscribe(
       (response: void) => {
@@ -105,6 +138,7 @@ export class EmployeeComponent implements OnInit {
   public search(): void {
     // Выполните ваш поиск с использованием значений, введенных в поля поиска
     // Например, используйте this.searchEmployee.name и this.searchEmployee.working
+    console.log(this.searchEmployee.working)
     this.employeeService.SearchEmployees(this.searchEmployee).subscribe(
       (response: Employee[]) => {
         this.employees = response;
@@ -115,20 +149,15 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
-  // public searchEmployees1(searchText: string,working:boolean): void {
-  //   console.log(searchText);
-  //   const results: SearchEmployee = {
-  //     name: searchText,
-  //     working: working
-  //   };
-  //   this.employeeService.getSearchEmployees(results);
+  onEnterSearch(): void {
+    this.search(); // Вызов метода поиска при нажатии клавиши "Enter"
+  }
 
+ 
 
-  // }
-
-  public nameOfPosition(employee: Employee): string{
+  public nameOfPosition(positionId: Number): string{
   for( const position of this.positions){
-    if(employee.positionId === position.id){
+    if(positionId === position.id){
         return position.name
       }     
     }
@@ -138,20 +167,23 @@ export class EmployeeComponent implements OnInit {
 
     
   
-  public onOpenModal(employee: Employee, mode: string): void {
+  public onOpenModal(employee: Employee | null, mode: string): void {
     const container = document.getElementById('main-container');
     const button = document.createElement('button');
     button.type = 'button';
     button.style.display = 'none';
     button.setAttribute('data-toggle', 'modal');
-    if (mode === 'add') {
+
+    
+    if (mode === 'add' || employee === null) {
       button.setAttribute('data-target', '#addEmployeeModal');
-    }
-    if (mode === 'edit') {
+      console.log("add")
+    } else if (mode === 'edit') {
+      console.log("edit")
       this.editEmployee = employee;
       button.setAttribute('data-target', '#updateEmployeeModal');
-    }
-    if (mode === 'delete') {
+    }else if (mode === 'delete') {
+      console.log("delete")
       this.deleteEmployee = employee;
       button.setAttribute('data-target', '#deleteEmployeeModal');
     }
