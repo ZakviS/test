@@ -5,6 +5,7 @@ import {NgForm} from "@angular/forms";
 import {EmployeeService} from "./employee.service";
 import { Position } from './position';
 import { SearchEmployee } from './SearchEmployee';
+import { EmployeeResponse } from './employeeResponse';
 
 @Component({
   selector: 'app-employee',
@@ -14,29 +15,26 @@ import { SearchEmployee } from './SearchEmployee';
 })
 export class EmployeeComponent implements OnInit {
   public employees: Employee[];
+  public employees1: Employee[];
+
   public positions: Position[];
-  public searchEmployee: SearchEmployee = { surname: '', working: true };
+  public searchEmployee: SearchEmployee = { surname: '', working: false, page: 0,  elementPerPage: 5,  direction: "dsc",  key: "surname"};
   public editEmployee: Employee;
   public deleteEmployee: Employee;
+  public employeeResponse: EmployeeResponse;
+
+  page = 1;
+  count = 0;
+  pageSize = 5;
+
 
   constructor(private employeeService: EmployeeService){}
 
   ngOnInit() {
-    this.getEmployees();
     this.getPosition();
+    this.getEmployeeResponse();
   }
 
-
-  public getEmployees(): void {
-    this.employeeService.getEmployees().subscribe(
-      (response: Employee[]) => {
-        this.employees = response;
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
-  }
 
   public getPosition(): void {
     this.employeeService.getPosition().subscribe(
@@ -49,12 +47,34 @@ export class EmployeeComponent implements OnInit {
     );
   }
   
+  public getEmployeeResponse(): void {
+    this.searchEmployee.page = this.page-1;
+    this.searchEmployee.elementPerPage = this.pageSize;
+    this.employeeService.getEmployeeResponse(this.searchEmployee).subscribe(
+      (response: EmployeeResponse) => {
+        this.employees = response.employee;
+        // this.collectionSize = response.totalElements;
+        this.count = response.totalElements;
+        console.log(response);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  handlePageChange(event: number): void {
+    this.page = event;
+    this.getEmployeeResponse();
+  }
+
+
   public onAddEmloyee(addForm: NgForm): void {
     document.getElementById('add-employee-form')!.click();
     this.employeeService.addEmployee(addForm.value).subscribe(
       (response: Employee) => {
         console.log(response);
-        this.getEmployees();
+        this.getEmployeeResponse();
         addForm.reset();
       },
       (error: HttpErrorResponse) => {
@@ -64,39 +84,14 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
-  //   public onAddEmloyee(addForm: NgForm): void {
-  //   console.log(addForm)
-  //   // const employee1: Employee = {
-  //   //   id: addForm.value.id,
-  //   //   name: addForm.value.name,
-  //   // surname: addForm.value.surname,
-  //   // secondSurname: addForm.value.secondSurname,
-  //   // beginning: addForm.value.beginning,
-  //   // dismissal: addForm.value.dismissal,
-  //   // phoneNumber: addForm.value.phoneNumber,
-  //   // email: addForm.value.email,
-  //   // positionId: addForm.value.positionId
-  //   // };
-  //   console.log(addForm.value)
-  //   this.employeeService.addEmployee(addForm.value).subscribe(
-  //         (response: Employee) => {
-  //           console.log(response);
-  //           this.getEmployees();
-  //           addForm.reset();
-  //         },
-  //         (error: HttpErrorResponse) => {
-  //           alert(error.message);
-  //           addForm.reset();
-  //         }
-  //       );
-  // }
+
 
   
   public onUpdateEmloyee(employee: Employee): void {
     this.employeeService.updateEmployee(employee).subscribe(
       (response: Employee) => {
         console.log(response);
-        this.getEmployees();
+        this.getEmployeeResponse();
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -104,15 +99,12 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
-  // public onUpdateEmloyee(employee: Employee): void {
-  //   console.log(employee)
-  //   console.log(employee.id)
-  // }
+
   
   public onDeleteEmloyee(employeeId: number): void {
     this.employeeService.deleteEmployee(employeeId).subscribe(
       (response: void) => {
-        this.getEmployees();
+        this.getEmployeeResponse();
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -120,28 +112,20 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
-  public searchEmployees(key: string): void {
-    console.log(key);
-    const results: Employee[] = [];
-    for (const employee of this.employees) {
-      if (employee.name.toLowerCase().indexOf(key.toLowerCase()) !== -1)
-      {
-        results.push(employee);
-      }
-    }
-    this.employees = results;
-    if (results.length === 0 || !key) {
-      this.getEmployees();
-    }
-  }
+
 
   public search(): void {
-    // Выполните ваш поиск с использованием значений, введенных в поля поиска
-    // Например, используйте this.searchEmployee.name и this.searchEmployee.working
+
     console.log(this.searchEmployee.working)
-    this.employeeService.SearchEmployees(this.searchEmployee).subscribe(
-      (response: Employee[]) => {
-        this.employees = response;
+    this.searchEmployee.page = 0;
+    this.searchEmployee.elementPerPage = this.pageSize;
+
+    this.employeeService.getEmployeeResponse(this.searchEmployee).subscribe(
+      (response: EmployeeResponse) => {
+        this.employees = response.employee;
+        // this.collectionSize = response.totalElements;
+        this.count = response.totalElements;
+        console.log(response);
       },
       (error: HttpErrorResponse) => {
         alert(error.message);

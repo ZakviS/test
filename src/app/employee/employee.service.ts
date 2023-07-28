@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Employee } from './employee';
 import { Position } from './position';
 import { SearchEmployee } from './SearchEmployee';
+import { EmployeeResponse } from './employeeResponse';
 
 
 @Injectable({providedIn: 'root'})
@@ -12,12 +13,8 @@ export class EmployeeService {
 
   constructor(private http: HttpClient){}
 
-  public getEmployees(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(`${this.apiServerUrl}/employee/search`);
-  }
-
-  public SearchEmployees(employee: SearchEmployee): Observable<Employee[]> {
-    return this.http.post<Employee[]>(`${this.apiServerUrl}/employee/search`,employee);
+  public getEmployeeResponse(searchEmployee : SearchEmployee): Observable<EmployeeResponse> {
+    return this.http.post<EmployeeResponse>(`${this.apiServerUrl}/employee/search`,searchEmployee);
   }
 
 

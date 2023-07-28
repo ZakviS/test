@@ -7,6 +7,7 @@ import {FormsModule} from "@angular/forms";
 import { AppComponent } from './app.component';
 import { EmployeeComponent } from './employee/employee.component';
 import {EmployeeService} from "./employee/employee.service";
+import { NgxPaginationModule } from 'ngx-pagination';
 
 
 @NgModule({
@@ -16,7 +17,9 @@ import {EmployeeService} from "./employee/employee.service";
   ],
   imports: [
     BrowserModule,
-    HttpClientModule, FormsModule
+    HttpClientModule, 
+    FormsModule,
+    NgxPaginationModule 
   ],
   providers: [EmployeeService],
   bootstrap: [AppComponent]
