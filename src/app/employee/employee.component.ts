@@ -53,7 +53,6 @@ export class EmployeeComponent implements OnInit {
     this.employeeService.getEmployeeResponse(this.searchEmployee).subscribe(
       (response: EmployeeResponse) => {
         this.employees = response.employee;
-        // this.collectionSize = response.totalElements;
         this.count = response.totalElements;
         console.log(response);
       },
@@ -123,7 +122,6 @@ export class EmployeeComponent implements OnInit {
     this.employeeService.getEmployeeResponse(this.searchEmployee).subscribe(
       (response: EmployeeResponse) => {
         this.employees = response.employee;
-        // this.collectionSize = response.totalElements;
         this.count = response.totalElements;
         console.log(response);
       },
@@ -173,6 +171,12 @@ export class EmployeeComponent implements OnInit {
     }
     container?.appendChild(button);
     button.click();
+  }
+
+  visible = false;
+
+  toggleCollapse(): void {
+    this.visible = !this.visible;
   }
 
 }
