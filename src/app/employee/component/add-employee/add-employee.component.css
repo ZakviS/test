@@ -173,9 +173,9 @@ text-decoration:none;
   align-items: center;
 }
 */
-.example-headers-align .mat-mdc-form-field + .mat-mdc-form-field {
+/* .example-headers-align .mat-mdc-form-field + .mat-mdc-form-field {
   margin-left: 5px;
-} 
+}  */
 
 /* Стилизация заголовка панели */
 .mat-expansion-panel-header {
@@ -208,12 +208,3 @@ mat-form-field {
   }
 }
 
-.row.gx-3.mb-3 {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.form-group {
-  flex: 1;
-  margin-right: 10px; /* Расстояние между инпутами */
-}

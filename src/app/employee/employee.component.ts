@@ -1,21 +1,26 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Employee} from "./employee";
 import {HttpErrorResponse} from "@angular/common/http";
 import {NgForm} from "@angular/forms";
 import {EmployeeService} from "./employee.service";
+import { SalaryService } from './service/salary.service';
 import { Position } from './position';
 import { SearchEmployee } from './SearchEmployee';
 import { EmployeeResponse } from './employeeResponse';
+import {MatAccordion, MatExpansionModule} from '@angular/material/expansion';
+import { Salary } from './model/salary';
 
 @Component({
   selector: 'app-employee',
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
-  template: '{{nameOfPosition()}}'
+  template: '{{nameOfPosition()}}',
 })
+
 export class EmployeeComponent implements OnInit {
   public employees: Employee[];
-  public employees1: Employee[];
+  public salarys: Salary[];
+  public currentFormId: string;  
 
   public positions: Position[];
   public searchEmployee: SearchEmployee = { surname: '', working: false, page: 0,  elementPerPage: 5,  direction: "dsc",  key: "surname"};
@@ -23,18 +28,36 @@ export class EmployeeComponent implements OnInit {
   public deleteEmployee: Employee;
   public employeeResponse: EmployeeResponse;
 
+  @ViewChild(MatAccordion) accordion: MatAccordion;
+  panelOpenState = false;
+
+
   page = 1;
   count = 0;
   pageSize = 5;
 
+  visible = false;
 
-  constructor(private employeeService: EmployeeService){}
+
+  constructor(private employeeService: EmployeeService,
+    private salaryService: SalaryService){}
 
   ngOnInit() {
     this.getPosition();
     this.getEmployeeResponse();
+    this.currentFormId='list'
   }
 
+  public getSalary(id:number): void {
+    this.salaryService.getSalaryById(id).subscribe(
+      (response: Salary[]) => {
+        this.salarys = response;
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
 
   public getPosition(): void {
     this.employeeService.getPosition().subscribe(
@@ -69,6 +92,7 @@ export class EmployeeComponent implements OnInit {
 
 
   public onAddEmloyee(addForm: NgForm): void {
+    console.log('asdasd');
     document.getElementById('add-employee-form')!.click();
     this.employeeService.addEmployee(addForm.value).subscribe(
       (response: Employee) => {
@@ -83,12 +107,40 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
+  public onAddSalary(addSalaryForm: NgForm): void {
+    console.log('onaddsalary')
+    console.log(addSalaryForm)
+    console.log(addSalaryForm.value)
 
+    this.salaryService.addSalary(addSalaryForm.value).subscribe(
+      (response: Salary) => {
+        console.log(response);
+        this.getSalary(addSalaryForm.value.employeeId);
+        addSalaryForm.reset();
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+        addSalaryForm.reset();
+      }
+    );
+  }
 
   
   public onUpdateEmloyee(employee: Employee): void {
     this.employeeService.updateEmployee(employee).subscribe(
       (response: Employee) => {
+        console.log(response);
+        this.getEmployeeResponse();
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  public onUpdateSalary(salary: Salary): void {
+    this.salaryService.updateSalary(salary).subscribe(
+      (response: Salary) => {
         console.log(response);
         this.getEmployeeResponse();
       },
@@ -173,10 +225,18 @@ export class EmployeeComponent implements OnInit {
     button.click();
   }
 
-  visible = false;
+  
 
-  toggleCollapse(): void {
-    this.visible = !this.visible;
+  public showForm(formId: string,employee: Employee | null): void {
+    this.currentFormId = formId; // Установите текущий идентификатор формы на основе выбранного значения
+    if(formId === 'add' || employee === null){
+
+    }else if(formId === 'edit'){
+      this.editEmployee = employee;
+      this.getSalary(employee.id)
+    }
   }
 
 }
+
+
