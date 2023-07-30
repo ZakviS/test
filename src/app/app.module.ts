@@ -17,7 +17,7 @@ import {MatNativeDateModule} from '@angular/material/core';
 
 import { AppComponent } from './app.component';
 import { EmployeeComponent } from './employee/employee.component';
-import {EmployeeService} from "./employee/employee.service";
+import {EmployeeService} from "./employee/service/employee.service";
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AddEmployeeComponent } from './employee/component/add-employee/add-employee.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -27,8 +27,7 @@ import { SalaryService } from './employee/service/salary.service';
 @NgModule({
   declarations: [
     AppComponent,
-    EmployeeComponent,
-    AddEmployeeComponent
+    EmployeeComponent
   ],
   imports: [
     BrowserModule,

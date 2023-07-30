@@ -1,14 +1,16 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Employee} from "./employee";
+import {Employee} from "./model/employee";
 import {HttpErrorResponse} from "@angular/common/http";
 import {NgForm} from "@angular/forms";
-import {EmployeeService} from "./employee.service";
+import {EmployeeService} from "./service/employee.service";
 import { SalaryService } from './service/salary.service';
-import { Position } from './position';
-import { SearchEmployee } from './SearchEmployee';
-import { EmployeeResponse } from './employeeResponse';
+import { Position } from './model/position';
+import { SearchEmployee } from './model/SearchEmployee';
+import { EmployeeResponse } from './model/employeeResponse';
 import {MatAccordion, MatExpansionModule} from '@angular/material/expansion';
 import { Salary } from './model/salary';
+import { PremiumService } from './service/premium.service';
+import { Premium } from './model/premium';
 
 @Component({
   selector: 'app-employee',
@@ -20,12 +22,19 @@ import { Salary } from './model/salary';
 export class EmployeeComponent implements OnInit {
   public employees: Employee[];
   public salarys: Salary[];
+  public premiums: Premium[];
+
   public currentFormId: string;  
 
   public positions: Position[];
   public searchEmployee: SearchEmployee = { surname: '', working: false, page: 0,  elementPerPage: 5,  direction: "dsc",  key: "surname"};
   public editEmployee: Employee;
+  public editSalary: Salary;
+  public editPremium: Premium;
   public deleteEmployee: Employee;
+  public deleteSalary: Salary;
+  public deletePremium: Premium;
+
   public employeeResponse: EmployeeResponse;
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
@@ -40,7 +49,8 @@ export class EmployeeComponent implements OnInit {
 
 
   constructor(private employeeService: EmployeeService,
-    private salaryService: SalaryService){}
+    private salaryService: SalaryService,
+    private premiumService: PremiumService){}
 
   ngOnInit() {
     this.getPosition();
@@ -52,6 +62,17 @@ export class EmployeeComponent implements OnInit {
     this.salaryService.getSalaryById(id).subscribe(
       (response: Salary[]) => {
         this.salarys = response;
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  public getPremium(id:number): void {
+    this.premiumService.getPremiumById(id).subscribe(
+      (response: Premium[]) => {
+        this.premiums = response;
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -91,8 +112,7 @@ export class EmployeeComponent implements OnInit {
   }
 
 
-  public onAddEmloyee(addForm: NgForm): void {
-    console.log('asdasd');
+  public onAddEmlpoyee(addForm: NgForm): void {
     document.getElementById('add-employee-form')!.click();
     this.employeeService.addEmployee(addForm.value).subscribe(
       (response: Employee) => {
@@ -108,9 +128,6 @@ export class EmployeeComponent implements OnInit {
   }
 
   public onAddSalary(addSalaryForm: NgForm): void {
-    console.log('onaddsalary')
-    console.log(addSalaryForm)
-    console.log(addSalaryForm.value)
 
     this.salaryService.addSalary(addSalaryForm.value).subscribe(
       (response: Salary) => {
@@ -125,8 +142,23 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
+  public onAddPremium(addPremiumForm: NgForm): void {
+
+    this.premiumService.addPremium(addPremiumForm.value).subscribe(
+      (response: Premium) => {
+        console.log(response);
+        this.getPremium(addPremiumForm.value.employeeId);
+        addPremiumForm.reset();
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+        addPremiumForm.reset();
+      }
+    );
+  }
+
   
-  public onUpdateEmloyee(employee: Employee): void {
+  public onUpdateEmlpoyee(employee: Employee): void {
     this.employeeService.updateEmployee(employee).subscribe(
       (response: Employee) => {
         console.log(response);
@@ -139,10 +171,25 @@ export class EmployeeComponent implements OnInit {
   }
 
   public onUpdateSalary(salary: Salary): void {
+    console.log(salary)
     this.salaryService.updateSalary(salary).subscribe(
       (response: Salary) => {
         console.log(response);
-        this.getEmployeeResponse();
+        this.getSalary(response.employeeId);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  public onUpdatePremium(premium: Premium): void {
+    console.log(premium)
+
+    this.premiumService.updatePremium(premium).subscribe(
+      (response: Premium) => {
+        console.log(response);
+        this.getPremium(response.employeeId);
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -156,6 +203,7 @@ export class EmployeeComponent implements OnInit {
     this.employeeService.deleteEmployee(employeeId).subscribe(
       (response: void) => {
         this.getEmployeeResponse();
+        
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -163,6 +211,27 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
+  public onDeleteSalary(salaryId: number): void {
+    this.salaryService.deleteSalary(salaryId).subscribe(
+      (response: void) => {
+        this.getSalary(this.deleteSalary.employeeId);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  public onDeletePremium(premiumId: number): void {
+    this.premiumService.deletePremium(premiumId).subscribe(
+      (response: void) => {
+        this.getPremium(this.deletePremium.employeeId);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
 
 
   public search(): void {
@@ -201,7 +270,7 @@ export class EmployeeComponent implements OnInit {
 
     
   
-  public onOpenModal(employee: Employee | null, mode: string): void {
+  public onOpenModal(employee: Employee , mode: string): void {
     const container = document.getElementById('main-container');
     const button = document.createElement('button');
     button.type = 'button';
@@ -209,14 +278,7 @@ export class EmployeeComponent implements OnInit {
     button.setAttribute('data-toggle', 'modal');
 
     
-    if (mode === 'add' || employee === null) {
-      button.setAttribute('data-target', '#addEmployeeModal');
-      console.log("add")
-    } else if (mode === 'edit') {
-      console.log("edit")
-      this.editEmployee = employee;
-      button.setAttribute('data-target', '#updateEmployeeModal');
-    }else if (mode === 'delete') {
+    if (mode === 'delete') {
       console.log("delete")
       this.deleteEmployee = employee;
       button.setAttribute('data-target', '#deleteEmployeeModal');
@@ -225,6 +287,47 @@ export class EmployeeComponent implements OnInit {
     button.click();
   }
 
+  public onOpenModalSalary(salary: Salary , mode: string): void {
+    const container = document.getElementById('main-container');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.style.display = 'none';
+    button.setAttribute('data-toggle', 'modal');
+
+    
+    if (mode === 'edit') {
+      console.log("editSalary")
+      this.editSalary = salary;
+      button.setAttribute('data-target', '#updateSalaryModal');
+    }else if (mode === 'delete') {
+      console.log("deleteSalary")
+      this.deleteSalary = salary;
+      button.setAttribute('data-target', '#deleteSalaryModal');
+    }
+    container?.appendChild(button);
+    button.click();
+  }
+
+  public onOpenModalPremium(premium: Premium , mode: string): void {
+    const container = document.getElementById('main-container');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.style.display = 'none';
+    button.setAttribute('data-toggle', 'modal');
+
+    
+    if (mode === 'edit') {
+      console.log("editPremium")
+      this.editPremium = premium;
+      button.setAttribute('data-target', '#updatePremiumModal');
+    }else if (mode === 'delete') {
+      console.log("deletePremium")
+      this.deletePremium = premium;
+      button.setAttribute('data-target', '#deletePremiumModal');
+    }
+    container?.appendChild(button);
+    button.click();
+  }
   
 
   public showForm(formId: string,employee: Employee | null): void {
@@ -234,6 +337,7 @@ export class EmployeeComponent implements OnInit {
     }else if(formId === 'edit'){
       this.editEmployee = employee;
       this.getSalary(employee.id)
+      this.getPremium(employee.id)
     }
   }
 

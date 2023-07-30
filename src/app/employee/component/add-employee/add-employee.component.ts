@@ -1,8 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import { Employee } from '../../employee';
-import { Position } from '../../position';
-import { EmployeeResponse } from '../../employeeResponse';
-import { EmployeeService } from '../../employee.service';
+import { Employee } from '../../model/employee';
+import { Position } from '../../model/position';
+import { EmployeeResponse } from '../../model/employeeResponse';
+import { EmployeeService } from '../../service/employee.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 

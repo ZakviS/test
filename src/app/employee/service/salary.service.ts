@@ -11,9 +11,7 @@ export class SalaryService {
 
   constructor(private http: HttpClient){}
 
-//   public getEmployeeResponse(searchEmployee : SearchEmployee): Observable<EmployeeResponse> {
-//     return this.http.post<EmployeeResponse>(`${this.apiServerUrl}/employee/search`,searchEmployee);
-//   }
+
 
   public getSalaryById(employeeId: number): Observable<Salary[]> {
     return this.http.get<Salary[]>(`${this.apiServerUrl}/salary/get/${employeeId}`);
@@ -27,21 +25,10 @@ export class SalaryService {
     return this.http.post<Salary>(`${this.apiServerUrl}/salary/add`, salary);
   }
 
-//   public getPosition(): Observable<Position[]> {
-//     return this.http.get<Position[]>(`${this.apiServerUrl}/position/all`);
-//   }
-
-//   public addEmployee(employee: Employee): Observable<Employee> {
-//     return this.http.post<Employee>(`${this.apiServerUrl}/employee/add`, employee);
-//   }
-
-//   public updateEmployee(employee: Employee): Observable<Employee> {
-//     return this.http.put<Employee>(`${this.apiServerUrl}/employee/edit/${employee.id}`, employee);
-//   }
   
-//   public deleteEmployee(employeeId: number): Observable<void> {
-//     return this.http.delete<void>(`${this.apiServerUrl}/employee/delete/${employeeId}`);
-//   }
+  public deleteSalary(salaryId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiServerUrl}/salary/delete/${salaryId}`);
+  }
 
 
 

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Employee } from './employee';
-import { Position } from './position';
-import { SearchEmployee } from './SearchEmployee';
-import { EmployeeResponse } from './employeeResponse';
+import { Employee } from '../model/employee';
+import { Position } from '../model/position';
+import { EmployeeResponse } from '../model/employeeResponse';
+import { SearchEmployee } from '../model/SearchEmployee';
 
 
 @Injectable({providedIn: 'root'})
