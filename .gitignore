@@ -26,6 +26,9 @@ yarn-error.log
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/package-lock.json
+!.vscode/package.json
+
 .history/*
 
 # Miscellaneous
@@ -34,9 +37,4 @@ yarn-error.log
 /connect.lock
 /coverage
 /libpeerconnection.log
-testem.log
-/typings
-
-# System files
-.DS_Store
-Thumbs.db
+testem

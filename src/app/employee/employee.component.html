@@ -16,7 +16,7 @@
                            <div class="col-12">
                                <div class="row no-gutters">
                                    <div class="col-lg-3 col-md-3 col-sm-12 p-0" >
-                                       <input  type="checkbox"  [(ngModel)]="searchEmployee.working" id="working" name="working" >
+                                       <input  type="checkbox"  [(ngModel)]="searchEmployee.working" id="working" name="working"  >
                                        <label for="working" >Скрыть уволенных:</label>
                                    </div>
                                    
@@ -46,6 +46,15 @@
           <a class="nav-link" (click)="showForm('add',null)">Добавить сотрудника</a>
         </li>
       </ul>
+      <div class="mt-3">
+     
+         Items per Page:
+         <select (change)="handlePageSizeChange($event)">
+           <option *ngFor="let size of pageSizes" [ngValue]="size">
+             {{ size }}
+           </option>
+         </select>
+       </div>
     </nav>
 
 
@@ -59,13 +68,13 @@
               <div class="main-box no-header clearfix">
                   <div class="main-box-body clearfix">
                       <div class="table-responsive">
-                          <table class="table user-list">
+                          <table class="table user-list" >
                               <thead>
                                   <tr>
-                                  <th><span>Employee</span></th>
-                                  <th><span>Beggining</span></th>
-                                  <th><span>Dismissal</span></th>
-                                  <th><span>Email</span></th>
+                                  <th><span (click)="sortForm('surname')">Employee {{sort}}</span></th>
+                                  <th><span (click)="sortForm('beginning')">Beginning {{sort}}</span></th>
+                                  <th><span (click)="sortForm('dismissal')">Dismissal {{sort}}</span></th>
+                                  <th><span (click)="sortForm('email')">Email {{sort}}</span></th>
                                   <th>&nbsp;</th>
                                   </tr>
                               </thead>
@@ -400,7 +409,82 @@
 
                      </div>
                     
-
+                     <form #addAllowanceForm="ngForm" (ngSubmit)="onAddAllowance(addAllowanceForm)">
+                        <div class="row gx-3 mb-3">
+                           <input type="hidden" ngModel="{{editEmployee.id}}" name="employeeId" class="form-control" id="employeeId" placeholder="Email">
+                          <div class="col-md-3">
+                            <div class="form-group">
+                              <label for="sum" class="small mb-3">Allowance</label>
+                              <input type="number" ngModel name="sum" class="form-control" id="sum" placeholder="Summa">
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="form-group">
+                              <label for="month" class="small mb-3">Date of salary</label>
+                              <input type="date" ngModel name="month" class="form-control" id="month" placeholder="Date">
+                            </div>
+                          </div>
+                          <div class="col-md-3">
+                            <div class="form-group">
+                              <label for="numberOfOrder" class="small mb-3">Number of order</label>
+                              <input type="number" ngModel name="numberOfOrder" class="form-control" id="numberOfOrder" placeholder="Number of order">
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="form-group">
+                              <label for="dateOfOrder" class="small mb-3">Date of order</label>
+                              <input type="date" ngModel name="dateOfOrder" class="form-control" id="dateOfOrder" placeholder="Date of order">
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                           <div class="form-group">
+                              <label for="dateOfOrder" class="small mb-3">as132312d</label>
+                             <button type="submit" class="btn btn-primary">Save Allowance</button>
+                           </div>
+                          
+                         </div>
+   
+                         <mat-accordion class="example-headers-align" multi>
+                           <mat-expansion-panel>
+                             <mat-expansion-panel-header>
+                               <mat-panel-title>
+                                 History
+                               </mat-panel-title>
+                               
+                             </mat-expansion-panel-header>
+                         
+                             <table class="table user-list">
+                              <thead>
+                                  <tr>
+                                  <th><span>Summa</span></th>
+                                  <th><span>Month</span></th>
+                                  <th><span>numberOfOrder</span></th>
+                                  <th><span>dateOfOrder</span></th>
+                                  <th>&nbsp;</th>
+                                  </tr>
+                              </thead>
+      
+                              <tbody *ngFor="let allowanse of allowanses">
+                                 <tr>                           
+                                    <td>{{allowanse.sum}}</td>
+                                    <td>{{allowanse.month}}</td>
+                                    <td>{{allowanse.numberOfOrder}}</td>
+                                    <td>{{allowanse.dateOfOrder}}</td>
+                                    <div class="card-body">
+                                       <div class="float-right btn-group btn-group-sm">
+                                          <a (click)="onOpenModalAllowance(allowanse, 'edit')"  class="btn btn-primary tooltips" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil"></i> </a> 
+                                          <a (click)="onOpenModalAllowance(allowanse, 'delete')" class="btn btn-secondary tooltips" data-placement="top" data-original-title="Delete"><i class="fa fa-times"></i></a>
+                                       </div>
+                                    </div>
+                                 </tr>
+      
+                          </table>
+      
+                           </mat-expansion-panel>
+                        
+                         </mat-accordion>
+   
+                        </div>
                     
                     
                      <div class="modal-footer">
@@ -408,6 +492,7 @@
                         <button type="submit" (click)="onUpdateEmlpoyee(editForm.value)"  type="submit" class="btn btn-primary"  class="btn btn-primary" (click)="showForm('list',null)">Save changes</button>
                         <!-- <button  data-dismiss="modal" class="btn btn-primary" >Save changes</button> -->
                      </div> 
+                  </form>
                   </form>
                   </form>
                   </form>
@@ -593,6 +678,82 @@
          </div>
       </div>
     </div>   
+
+
+
+     <!-- Delete Allowance Modal -->
+     <div class="modal fade" id="deleteAllowanceModal" tabindex="-1" role="dialog" aria-labelledby="deleteModelLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="deleteModelLabel">Delete EmployeeAllowance</h5>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <p>Are you sure you want to delete salary {{deleteAllowance?.numberOfOrder}}?</p>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                  <button (click)="onDeleteAllowance(deleteAllowance.id)" class="btn btn-danger" data-dismiss="modal">Yes</button>
+               </div>
+            </div>
+         </div>
+      </div>
+    </div>
+    
+    
+    <!-- Edit Allowance  Modal -->
+ 
+    <div class="modal fade" id="updateAllowanceModal" tabindex="-1" role="dialog" aria-labelledby="editModelLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="editModelLabel">edit EmployeeAllowance</h5>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <form #editAllowanceForm="ngForm" >
+                  <div class="row gx-3 mb-3">
+                     <input type="hidden" ngModel="{{editEmployee?.id}}" name="employeeId" class="form-control" id="employeeId" placeholder="Email">
+                     <input type="hidden" ngModel="{{editAllowance?.id}}" name="id" class="form-control" id="id" placeholder="Email">
+                    <div class="col-md-5">
+                      <div class="form-group">
+                        <label for="sum" class="small mb-3">Allowance</label>
+                        <input type="number" ngModel="{{editAllowance?.sum}}" name="sum" class="form-control" id="sum" placeholder="Summa">
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <div class="form-group">
+                        <label for="month" class="small mb-3">Date of Allowance</label>
+                        <input type="date" ngModel="{{editAllowance?.month}}" name="month" class="form-control" id="month" placeholder="Date">
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <div class="form-group">
+                        <label for="numberOfOrder" class="small mb-3">Number of order</label>
+                        <input type="number" ngModel="{{editAllowance?.numberOfOrder}}" name="numberOfOrder" class="form-control" id="numberOfOrder" placeholder="Number of order">
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <div class="form-group">
+                        <label for="dateOfOrder" class="small mb-3">Date of order</label>
+                        <input type="date" ngModel="{{editAllowance?.dateOfOrder}}" name="dateOfOrder" class="form-control" id="dateOfOrder" placeholder="Date of order">
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                     <button type="button" id="add-allowance-form" data-dismiss="modal" class="btn btn-secondary" >Close</button>
+                     <button type="submit" (click)="onUpdateAllowance(editAllowanceForm.value)"  type="submit" class="btn btn-primary"  class="btn btn-primary" >Save changes</button>
+                  </div> 
+
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+    </div>
 
    </div>
 

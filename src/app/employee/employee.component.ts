@@ -11,6 +11,8 @@ import {MatAccordion, MatExpansionModule} from '@angular/material/expansion';
 import { Salary } from './model/salary';
 import { PremiumService } from './service/premium.service';
 import { Premium } from './model/premium';
+import { Allowance } from './model/allowance';
+import { AllowanceService } from './service/allowance.service';
 
 @Component({
   selector: 'app-employee',
@@ -23,17 +25,22 @@ export class EmployeeComponent implements OnInit {
   public employees: Employee[];
   public salarys: Salary[];
   public premiums: Premium[];
+  public allowanses: Allowance[];
 
   public currentFormId: string;  
+  public sort:string;
 
   public positions: Position[];
   public searchEmployee: SearchEmployee = { surname: '', working: false, page: 0,  elementPerPage: 5,  direction: "dsc",  key: "surname"};
   public editEmployee: Employee;
   public editSalary: Salary;
+  public editAllowance: Allowance;
   public editPremium: Premium;
   public deleteEmployee: Employee;
   public deleteSalary: Salary;
   public deletePremium: Premium;
+  public deleteAllowance: Allowance;
+
 
   public employeeResponse: EmployeeResponse;
 
@@ -44,13 +51,15 @@ export class EmployeeComponent implements OnInit {
   page = 1;
   count = 0;
   pageSize = 5;
+  pageSizes = [5, 10, 20];
 
   visible = false;
 
 
   constructor(private employeeService: EmployeeService,
     private salaryService: SalaryService,
-    private premiumService: PremiumService){}
+    private premiumService: PremiumService,
+    private allowanceService: AllowanceService){}
 
   ngOnInit() {
     this.getPosition();
@@ -80,6 +89,17 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
+  public getAllowance(id:number): void {
+    this.allowanceService.getAllowanceById(id).subscribe(
+      (response: Allowance[]) => {
+        this.allowanses = response;
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
   public getPosition(): void {
     this.employeeService.getPosition().subscribe(
       (response: Position[]) => {
@@ -94,6 +114,7 @@ export class EmployeeComponent implements OnInit {
   public getEmployeeResponse(): void {
     this.searchEmployee.page = this.page-1;
     this.searchEmployee.elementPerPage = this.pageSize;
+
     this.employeeService.getEmployeeResponse(this.searchEmployee).subscribe(
       (response: EmployeeResponse) => {
         this.employees = response.employee;
@@ -108,6 +129,12 @@ export class EmployeeComponent implements OnInit {
 
   handlePageChange(event: number): void {
     this.page = event;
+    this.getEmployeeResponse();
+  }
+
+  handlePageSizeChange(event: any): void {
+    this.pageSize = event.target.value;
+    this.page = 1;
     this.getEmployeeResponse();
   }
 
@@ -157,6 +184,21 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
+  public onAddAllowance(addAllowanceForm: NgForm): void {
+
+    this.allowanceService.addAllowance(addAllowanceForm.value).subscribe(
+      (response: Allowance) => {
+        console.log(response);
+        this.getAllowance(addAllowanceForm.value.employeeId);
+        addAllowanceForm.reset();
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+        addAllowanceForm.reset();
+      }
+    );
+  }
+
   
   public onUpdateEmlpoyee(employee: Employee): void {
     this.employeeService.updateEmployee(employee).subscribe(
@@ -197,7 +239,18 @@ export class EmployeeComponent implements OnInit {
     );
   }
 
+  public onUpdateAllowance(allowance: Allowance): void {
 
+    this.allowanceService.updateAllowance(allowance).subscribe(
+      (response: Allowance) => {
+        console.log(response);
+        this.getAllowance(response.employeeId);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
   
   public onDeleteEmloyee(employeeId: number): void {
     this.employeeService.deleteEmployee(employeeId).subscribe(
@@ -226,6 +279,17 @@ export class EmployeeComponent implements OnInit {
     this.premiumService.deletePremium(premiumId).subscribe(
       (response: void) => {
         this.getPremium(this.deletePremium.employeeId);
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  public onDeleteAllowance(allowanceId: number): void {
+    this.allowanceService.deleteAllowance(allowanceId).subscribe(
+      (response: void) => {
+        this.getAllowance(this.deleteAllowance.employeeId);
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -328,6 +392,27 @@ export class EmployeeComponent implements OnInit {
     container?.appendChild(button);
     button.click();
   }
+
+  public onOpenModalAllowance(allowance: Allowance , mode: string): void {
+    const container = document.getElementById('main-container');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.style.display = 'none';
+    button.setAttribute('data-toggle', 'modal');
+
+    
+    if (mode === 'edit') {
+      console.log("editAllowance")
+      this.editAllowance = allowance;
+      button.setAttribute('data-target', '#updateAllowanceModal');
+    }else if (mode === 'delete') {
+      console.log("deleteAllowance")
+      this.deleteAllowance = allowance;
+      button.setAttribute('data-target', '#deleteAllowanceModal');
+    }
+    container?.appendChild(button);
+    button.click();
+  }
   
 
   public showForm(formId: string,employee: Employee | null): void {
@@ -338,7 +423,21 @@ export class EmployeeComponent implements OnInit {
       this.editEmployee = employee;
       this.getSalary(employee.id)
       this.getPremium(employee.id)
+      this.getAllowance(employee.id)
     }
+  }
+
+  public sortForm(formId: string):void {
+    if(this.searchEmployee.direction === 'dsc'){
+      this.searchEmployee.direction = 'asc'
+      this.sort = '▲'
+    } else {
+      this.searchEmployee.direction = 'dsc'
+      this.sort = '▼'
+    }
+
+        this.searchEmployee.key = formId;
+        this.getEmployeeResponse();
   }
 
 }

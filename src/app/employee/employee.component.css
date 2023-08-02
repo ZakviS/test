@@ -217,3 +217,11 @@ mat-form-field {
   flex: 1;
   margin-right: 10px; /* Расстояние между инпутами */
 }
+
+th.sorted[data-order="-1"]::after {
+	content: "▼"
+}
+
+th.sorted[data-order="1"]::after {
+	content: "▲"
+}
