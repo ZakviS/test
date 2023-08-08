@@ -22,6 +22,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { AddEmployeeComponent } from './employee/component/add-employee/add-employee.component';
 import { AppRoutingModule } from './app-routing.module';
 import { SalaryService } from './employee/service/salary.service';
+import { ApiService } from './api/api.service';
 
 
 @NgModule({
@@ -45,7 +46,7 @@ import { SalaryService } from './employee/service/salary.service';
     MatNativeDateModule,
     AppRoutingModule
   ],
-  providers: [EmployeeService , SalaryService],
+  providers: [EmployeeService , SalaryService,ApiService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
