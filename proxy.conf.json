@@ -1,0 +1,8 @@
+{
+  "/pr-api": {
+    "target1": "http://192.168.22.150:5353",
+    "target": "http://localhost:8080",
+    "secure": false,
+    "logLevel": "debug"
+  }
+}
